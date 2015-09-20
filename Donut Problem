@@ -1,0 +1,111 @@
+import java.util.Scanner;
+
+/**
+ * Created by ravikumarsingh on 3/19/15.
+ */
+
+public class NewDonut {
+
+    static double xMedian = 0;
+    static double yMedian = 0;
+
+    public static void main(String[] args) {
+        int middleElement =0;
+        int nextMiddleElement =0;
+        int minSumOfDis =0;
+        Scanner sc = new Scanner(System.in);
+        int numberOfPoliceStation = sc.nextInt();
+        int[] xCordinates =  new int[numberOfPoliceStation];
+        int[] yCordinates = new int[numberOfPoliceStation];
+        for (int i = 0; i < numberOfPoliceStation; i++){
+            xCordinates[i] = sc.nextInt();
+            yCordinates[i] = sc.nextInt();
+        }
+        // If number of police station is even , then checking both n/2 and n/2+1 position
+        if( numberOfPoliceStation%2 ==0) {
+            middleElement = numberOfPoliceStation/2;
+            nextMiddleElement = numberOfPoliceStation/2+1;
+            xMedian = findingMedian(xCordinates, 0, numberOfPoliceStation - 1, middleElement);
+            yMedian = findingMedian(yCordinates, 0, numberOfPoliceStation - 1, middleElement);
+            minSumOfDis=  findingTheMinDis(xCordinates,yCordinates);
+            xMedian = findingMedian(xCordinates, 0, numberOfPoliceStation - 1, nextMiddleElement);
+            yMedian = findingMedian(yCordinates, 0, numberOfPoliceStation - 1, nextMiddleElement);
+            int nextMinSumOfDis=  findingTheMinDis(xCordinates,yCordinates);
+            if( minSumOfDis > nextMinSumOfDis){
+                minSumOfDis = nextMinSumOfDis;
+            }
+        }
+        // If number of police station is odd, then checking the middle position
+        else {
+            middleElement = (numberOfPoliceStation+1) / 2;
+            xMedian = findingMedian(xCordinates, 0, numberOfPoliceStation - 1, middleElement);
+            yMedian = findingMedian(yCordinates, 0, numberOfPoliceStation - 1, middleElement);
+            minSumOfDis = findingTheMinDis(xCordinates,yCordinates);
+        }
+        System.out.println(minSumOfDis);
+    }
+
+    // Finding the minimum distance between all the points and the middle element
+    private static int findingTheMinDis(int[] xCordinates, int[] yCordinates) {
+        int x=0, y=0;
+        for( int i = 0; i < xCordinates.length ; i++){
+            x+=Math.abs(xMedian - xCordinates[i]);
+        }
+        for( int i = 0; i < yCordinates.length ; i++){
+            y+=Math.abs(yMedian - yCordinates[i]);
+        }
+        return x+y;
+    }
+
+    // Finding the medium using K select algo
+    private static int findingMedian(int[] array, int left, int right, int kthSmallestElement) {
+        // if k is smaller than number of elements in array
+        if(kthSmallestElement >0 && kthSmallestElement <= (right-left)+1){
+            // finding the correct position of kth element
+            int pos = fixedPartition(array, left, right);
+            // if kth is same as position
+            if( pos-left ==kthSmallestElement-1){
+                return array[pos];
+            }
+            //if position is more then recur to left
+            if(pos-left > kthSmallestElement-1){
+                return findingMedian(array, left, pos - 1, kthSmallestElement);
+            }
+            // else recur to right
+            else {
+                return findingMedian(array, pos + 1, right, kthSmallestElement - pos + left - 1);
+            }
+        }
+        // if k is more than number of elements in array
+        return Integer.MAX_VALUE;
+    }
+
+    // Picks a middle element as pivot and partitions the array around the pivot
+    private static int fixedPartition(int[] array, int left, int right) {
+        int n = right-left+1;
+        int pivot = array.length % n; // finding the pivot
+        swap(array, left + pivot, right); // and moving pivot to last positon
+        return partition(array, left, right); // rearranging the elements around pivot position
+    }
+    // rearranging the elements around pivot position
+    static int partition(int arr[], int l, int r)
+    {
+        int x = arr[r], i = l;
+        for (int j = l; j <= r - 1; j++)
+        {
+            if (arr[j] <= x)
+            {
+                swap(arr, i, j);
+                i++;
+            }
+        }
+        swap(arr,i, r);
+        return i;
+    }
+    // function to swap the elements
+    private static void swap(int[]array, int i, int j) {
+        int temp = array[i];
+        array[i]=array[j];
+        array[j]=temp;
+    }
+}
